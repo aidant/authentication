@@ -15,7 +15,7 @@ jobs:
         uses: docker/build-push-action@v1
         with:
           registry: docker.pkg.github.com
-          username: ${{ github.repository_owner }}
-          password: ${{ secrets.GITHUB_TOKEN }}]
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
           repository: ${{ github.repository }}/authentication
           tags: latest
