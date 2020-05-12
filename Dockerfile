@@ -5,7 +5,7 @@ RUN npm ci
 RUN npm run build
 RUN npm ci --production
 
-FROM docker.pkg.github.com/aidant/distroless/node:14
+FROM node:14-alpine
 WORKDIR /application
 COPY --from=builder /application/package.json /application/package.json
 COPY --from=builder /application/lib/ /application/lib/
