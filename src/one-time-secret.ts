@@ -1,34 +1,32 @@
 import crypto from 'crypto'
 import { promisify } from 'util'
-import { namespace } from './utilities/log.js'
-
-const log = namespace('one-time-secert')
 
 export class OneTimeSecret {
-  static generate = promisify(crypto.randomBytes)
+  static async generate () {
+    return (await promisify(crypto.randomBytes)(4)).toString('hex')
+  }
 
-  #secret?: string
-  #timeout?: NodeJS.Timeout
-  
+  static compare (a: string, b: string) {
+    if (a.length !== b.length) return false
+    return crypto.timingSafeEqual(Buffer.from(a), Buffer.from(b))
+  }
+
+  #secrets = new Set<string>()
+
   async generate () {
-    log('generate')
-    const buffer = await OneTimeSecret.generate(4)
-    this.#secret = buffer.toString('base64').replace(/=/g, '')
-    this.#timeout = setTimeout(() => this.invalidate(), 60000)
-    return this.#secret
+    const secret = await OneTimeSecret.generate()
+    this.#secrets.add(secret)
+    setTimeout(() => this.#secrets.delete(secret), 60000)
+    return secret
   }
 
-  validate (secret: string) {
-    log('validate')
-    if (!this.#secret) return false
-    if (this.#secret.length !== secret.length) return false
-    return crypto.timingSafeEqual(Buffer.from(this.#secret), Buffer.from(secret))
-  }
-
-  invalidate () {
-    log('invalidate')
-    if (this.#timeout) clearTimeout(this.#timeout)
-    this.#secret = undefined
-    this.#timeout = undefined
+  consume (secret: string): boolean {
+    for (const s of this.#secrets) {
+      if (OneTimeSecret.compare(secret, s)) {
+        this.#secrets.delete(s)
+        return true
+      }
+    }
+    return false
   }
 }

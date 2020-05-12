@@ -11,4 +11,10 @@ COPY --from=builder /application/package.json /application/package.json
 COPY --from=builder /application/lib/ /application/lib/
 COPY --from=builder /application/node_modules/ /application/node_modules/
 ENV NODE_ENV production
-CMD ["--enable-source-maps", "/application/lib/entrypoint.js"]
+CMD [\
+  "--enable-source-maps",\
+  "--throw-deprecation",\
+  "--trace-warnings",\
+  "--unhandled-rejections=strict",\
+  "/application/lib/entrypoint.js"\
+  ]
