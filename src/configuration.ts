@@ -1,15 +1,19 @@
-export const isDevelopment = process.env.NODE_ENV !== 'production'
+export const isDevelopment = false ?? process.env.NODE_ENV !== 'production'
 export const isProduction = !isDevelopment
 
-const env = (property: string): string => {
+const env = (property: string, required: boolean = false): string => {
   if (process.env[property]) return process.env[property] as string
-  throw new Error(`Environment Variable: "${property}" is undefined.`)
+  if (required) throw new Error(`Environment Variable: "${property}" is undefined.`)
+  else return ''
 }
 
 export const configuration = {
+  acme: {
+    challenge: env('ACME_CHALLENGE_WEBROOT', isProduction),
+  },
   tls: {
-    key: env('TLS_KEY'),
-    cert: env('TLS_CERT'),
-    ca: env('TLS_CA'),
+    key: env('TLS_KEY', isProduction),
+    cert: env('TLS_CERT', isProduction),
+    ca: env('TLS_CA', isProduction),
   },
 }

@@ -8,8 +8,10 @@ console.log(String.raw`
 `)
 
 import Hapi from '@hapi/hapi'
+import Inert from '@hapi/inert'
 import { Server } from 'https'
 import { isDevelopment, isProduction } from './configuration.js'
+import { registerWellKnownACMEChallenge } from './endpoints/.well-known/acme-challenge.js'
 import { registerConsumeOneTimeSecret, registerGenerateOneTimeSecret } from './endpoints/devices/create-device.js'
 import { registerListAllEndpoints } from './endpoints/list-all-endpoints.js'
 import { log } from './utilities/log.js'
@@ -29,10 +31,16 @@ const server = Hapi.server({
   },
 })
 
-if (isProduction) watchCertificates(server.listener as Server)
 log(server.info)
 
+await server.register([
+  { plugin: Inert },
+])
+
+if (isProduction) watchCertificates(server.listener as Server)
+
 registerListAllEndpoints(server)
+if (isProduction) registerWellKnownACMEChallenge(server)
 registerGenerateOneTimeSecret(server)
 registerConsumeOneTimeSecret(server)
 
