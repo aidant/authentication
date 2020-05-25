@@ -13,8 +13,10 @@ COPY --from=builder /application/node_modules/ /application/node_modules/
 ENV NODE_ENV production
 CMD [\
   "--enable-source-maps",\
+  "--experimental-top-level-await",\
+  "--harmony",\
   "--throw-deprecation",\
   "--trace-warnings",\
   "--unhandled-rejections=strict",\
   "/application/lib/entrypoint.js"\
-  ]
+]
