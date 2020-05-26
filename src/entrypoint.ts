@@ -10,7 +10,7 @@ console.log(String.raw`
 import Hapi from '@hapi/hapi'
 import Inert from '@hapi/inert'
 import { Server } from 'https'
-import { isDevelopment, isProduction } from './configuration.js'
+import { configuration, isDevelopment, isProduction } from './configuration.js'
 import { registerWellKnownACMEChallenge } from './endpoints/.well-known/acme-challenge.js'
 import { registerConsumeOneTimeSecret, registerGenerateOneTimeSecret } from './endpoints/devices/create-device.js'
 import { registerListAllEndpoints } from './endpoints/list-all-endpoints.js'
@@ -40,7 +40,7 @@ await server.register([
 if (isProduction) watchCertificates(server.listener as Server)
 
 registerListAllEndpoints(server)
-if (isProduction) registerWellKnownACMEChallenge(server)
+if (configuration.acme.challenge) registerWellKnownACMEChallenge(server)
 registerGenerateOneTimeSecret(server)
 registerConsumeOneTimeSecret(server)
 
