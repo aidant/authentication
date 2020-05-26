@@ -1,4 +1,4 @@
-export const isDevelopment = false ?? process.env.NODE_ENV !== 'production'
+export const isDevelopment = process.env.NODE_ENV !== 'production'
 export const isProduction = !isDevelopment
 
 const env = (property: string, required: boolean = false): string => {
